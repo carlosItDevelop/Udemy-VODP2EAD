@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using VOD.Common.DTOModels.UI;
 using VOD.Common.Entities;
 using VOD.Database.Contexts;
-using VOD.Database.Migrations;
 using VOD.Database.Services;
-using VOD.Common.DTOModels.UI;
 
 namespace VOD.UI
 {
@@ -38,10 +34,9 @@ namespace VOD.UI
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<VODUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<VODContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllersWithViews();
 
             services.AddScoped<IDbReadService, DbReadService>();
             services.AddScoped<IUIReadService, UIReadService>();
@@ -74,12 +69,12 @@ namespace VOD.UI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, VODContext db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, VODContext db)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                //app.UseDatabaseErrorPage(); // Deprecated after 3.1
             }
             else
             {
@@ -100,11 +95,11 @@ namespace VOD.UI
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

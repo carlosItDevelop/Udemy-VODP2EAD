@@ -1,6 +1,7 @@
 ﻿@page
 @model DeleteModel
 @inject SignInManager<VODUser> SignInManager
+
 @{
     ViewData["Title"] = "Delete Course";
     var description = Model.Input.Description.Truncate(100);
